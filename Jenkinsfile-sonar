@@ -7,28 +7,39 @@ pipeline {
     }
     environment {
         // Configuration générale
-        PROJECT_NAME = "petclinic"
+        PROJECT_KEY = "KAN"
+    }
+    options {
+        parallelAlwaysFailFast()
     }
     stages {
-        stage('Q/A Analysis (SonarQube)') {
+        parallel {
+            stage('Build Petclinic Checkstyle') {
+                steps {
+                    sh 'mvn clean package checkstyle:checkstyle'
+                }
+            }
+
+            stage('Q/A Analysis (SonarQube)') {
             steps {
                 // Analyse statique du code
 
-                withSonarQubeEnv('SonarQube') {
-                           sh "mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${PROJECT_NAME}"
-            }
-                 }
-            post {
+                    withSonarQubeEnv('SonarQube') {
+                    sh "mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${PROJECT_KEY}"
+
+                    }
+                }
+                post {
                 // If Maven was able to run the tests, even if some of the test
-                // failed, record the test results and archive the jar file.
-                success {
+                    // failed, record the test results and archive the jar file.
+                    success {
                     junit '**/target/surefire-reports/TEST-*.xml'
-                    archiveArtifacts 'target/*.war'
+                        archiveArtifacts 'target/*.war'
 
-
-       }
+                    }
+                }
             }
-    }
-}
+        }
+   }
 
 }
