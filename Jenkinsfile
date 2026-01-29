@@ -10,7 +10,7 @@ pipeline {
             steps {
                 // Run Maven on a Unix agent.
                 sh 'chmod +x mvnw'
-                sh "./mvn clean install package"
+                sh "./mvnw clean install package"
             }
             post {
                 // If Maven was able to run the tests, even if some of the test
