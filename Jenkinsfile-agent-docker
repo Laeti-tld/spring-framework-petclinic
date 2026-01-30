@@ -1,0 +1,11 @@
+stage('Build Java') {
+    agent {
+        docker { image 'maven:3.9-eclipse-temurin-21' }
+    }
+    steps {
+        sh 'mvn clean package'
+
+        // Cette commande "sort" le fichier du conteneur avant qu'il ne soit détruit
+        archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+    }
+}
