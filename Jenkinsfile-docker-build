@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+    environment {
+        NEXUS_URL = 'http://nexus:8081/repository/maven-releases'
+        GROUP_ID = 'org/springframework/samples'
+        ARTIFACT_ID = 'spring-framework-petclinic'
+        VERSION = '5.2.4'
+        WAR_NAME = 'petclinic.war'
+        DOCKER_IMAGE = 'petclinic-app'
+        NEXUS_CREDENTIALS = credentials('nexuslogin')
+    }
+    stages {
+        stage('Download Artifact from Nexus') {
+            steps {
+                script {
+                    def artifactUrl = "${NEXUS_URL}/${GROUP_ID}/${ARTIFACT_ID}/${VERSION}/${ARTIFACT_ID}-${VERSION}.war"
+                    sh "curl -u ${NEXUS_CREDENTIALS} -o ${WAR_NAME} ${artifactUrl}"
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${DOCKER_IMAGE}:${VERSION}")
+                }
+            }
+        }
+    }
+}
