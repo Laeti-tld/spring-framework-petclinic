@@ -14,4 +14,12 @@ pipeline {
 
         }
     }
+    post {
+        always {
+            logParser{
+
+            }
+        }
+    }
+
 }
